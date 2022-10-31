@@ -174,6 +174,8 @@ PYBIND11_MODULE(segment, m)
                 py::arg("module_config"),
                 py::return_value_policy::reference_internal);
 
+    //Builder.def("init_module", &BuilderProxy::init_module, py::object());
+
     Builder.def("make_node_full", &BuilderProxy::make_node_full, py::return_value_policy::reference_internal);
 
     Builder.def("make_py2cxx_edge_adapter", &BuilderProxy::make_py2cxx_edge_adapter);
@@ -227,15 +229,35 @@ PYBIND11_MODULE(segment, m)
     /** Module Register Interface Declarations **/
     SegmentModuleRegistry.def(py::init());
 
-    SegmentModuleRegistry.def("contains_namespace", &ModuleRegistryProxy::contains_namespace,
+    SegmentModuleRegistry.def("contains_namespace",
+                              &ModuleRegistryProxy::contains_namespace,
                               py::arg("registry_namespace"));
 
+    SegmentModuleRegistry.def("contains",
+                              &ModuleRegistryProxy::contains,
+                              py::arg("name"),
+                              py::arg("registry_namespace"));
+
+    SegmentModuleRegistry.def("find_module",
+                              &ModuleRegistryProxy::find_module,
+                              py::arg("name"),
+                              py::arg("registry_namespace"),
+                              py::arg("module_name"),
+                              py::arg("module_config"),
+                              py::return_value_policy::reference_internal);
+
+    SegmentModuleRegistry.def("is_version_compatible",
+                              &ModuleRegistryProxy::is_version_compatible,
+                              py::arg("release_version"));
+
+    SegmentModuleRegistry.def("unregister_module",
+                              &ModuleRegistryProxy::contains_namespace,
+                              py::arg("name"));
+
+    SegmentModuleRegistry.def("registered_modules", &ModuleRegistryProxy::registered_modules);
+
+
     // TODO(bhargav)
-    // contains
-    // find_module
-    // registered_modules
-    // unregister_module
-    // is_version_compatible
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

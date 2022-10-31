@@ -33,16 +33,44 @@ class ModuleRegistryProxy
         return srf::modules::ModuleRegistry::contains_namespace(registry_namespace);
     }
 
+    static bool contains(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace)
+    {
+        return srf::modules::ModuleRegistry::contains(name, registry_namespace);
+    }
+
+    static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self){
+        return srf::modules::ModuleRegistry::registered_modules();
+    }
+
+    static void unregister_module(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace, bool optional){
+        return srf::modules::ModuleRegistry::unregister_module(name, registry_namespace, optional);
+    }
+
+    static void unregister_module(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace){
+        return srf::modules::ModuleRegistry::unregister_module(name, registry_namespace);
+    }
+
+    static bool is_version_compatible(ModuleRegistryProxy& self, const std::vector<unsigned int>& release_version){
+        return srf::modules::ModuleRegistry::is_version_compatible(release_version);
+    }
+
+    std::shared_ptr<srf::modules::SegmentModule> ModuleRegistry::find_module(
+                                                        ModuleRegistryProxy& self,
+                                                        const std::string& module_id,
+                                                        const std::string& registry_namespace,
+                                                        std::string module_name,
+                                                        py::dict config)
+    {
+    auto json_config = cast_from_pyobject(config);
+    auto fn_module_constructor = srf::modules::ModuleRegistry::find_module(module_id, registry_namespace);
+    auto module                = std::move(fn_module_constructor(std::move(module_name), std::move(config)));
+
+    return std::move(module);
+    }
     // TODO(devin)
     // register_module
 
     // TODO(bhargav)
-    // contains
-    // find_module
-    // registered_modules
-    // unregister_module
-    // is_version_compatible
 };
-
 #pragma GCC visibility pop
-}  // namespace srf::pysrf
+} // namespace srf::pysrf

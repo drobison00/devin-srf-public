@@ -21,9 +21,10 @@ from .core.node import SegmentObject
 from .core.options import Config
 from .core.options import Options
 from .core.pipeline import Pipeline
+from .core.plugins import PluginModule
 from .core.segment import Builder
-from .core.segment import SegmentModule
-from .core.segment import ModuleRegistry
+from .core.segment_modules import SegmentModule
+from .core.segment_modules import ModuleRegistry
 from .core.subscriber import Observable
 from .core.subscriber import Observer
 from .core.subscriber import Subscriber

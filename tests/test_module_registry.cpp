@@ -110,19 +110,15 @@ TEST_F(SegmentTests, UnRegistrerModuleTest)
 {
     using namespace modules;
 
-    std::string period              = ".";
-    std::string release_version_str = std::to_string(srf_VERSION_MAJOR) + period + std::to_string(srf_VERSION_MINOR) +
-                                      period + std::to_string(srf_VERSION_PATCH);
-
     std::string registry_namespace = "module_registry_unittest";
     std::string simple_mod_name    = "SimpleModule";
 
-    ModuleRegistry::unregister_module(simple_mod_name, release_version_str);
+    ModuleRegistry::unregister_module(simple_mod_name, registry_namespace);
 
-    ModuleRegistry::unregister_module(simple_mod_name, release_version_str, true);
+    ModuleRegistry::unregister_module(simple_mod_name, registry_namespace, true);
 
     // Throws an exception when there is no registered module.
-    EXPECT_THROW(ModuleRegistry::unregister_module(simple_mod_name, release_version_str, false), std::invalid_argument);
+    EXPECT_THROW(ModuleRegistry::unregister_module(simple_mod_name, registry_namespace, false), std::invalid_argument);
 }
 
 TEST_F(SegmentTests, VersionCompatibleTest)

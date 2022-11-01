@@ -19,6 +19,7 @@
 
 #include "pysrf/utils.hpp"
 #include <pybind11/cast.h>
+#include <pybind11/pytypes.h>
 #include "srf/experimental/modules/module_registry.hpp"
 
 namespace srf::pysrf {
@@ -43,6 +44,11 @@ class ModuleRegistryProxy
         return srf::modules::ModuleRegistry::contains(name, registry_namespace);
     }
 
+    static bool contains_in_default(ModuleRegistryProxy& self, const std::string& name)
+    {
+        return srf::modules::ModuleRegistry::contains(name, "default");
+    }
+
     static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self){
         return srf::modules::ModuleRegistry::registered_modules();
     }
@@ -51,11 +57,16 @@ class ModuleRegistryProxy
         return srf::modules::ModuleRegistry::unregister_module(name, registry_namespace, optional);
     }
 
-    static void unregister_module(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace){
-        return srf::modules::ModuleRegistry::unregister_module(name, registry_namespace);
+    static void unregister_module_in_default_ns(ModuleRegistryProxy& self, const std::string& name){
+        return srf::modules::ModuleRegistry::unregister_module(name, "default", true);
     }
 
-    static bool is_version_compatible(ModuleRegistryProxy& self, const std::vector<unsigned int>& release_version){
+    static void unregister_module_in_default_ns_2(ModuleRegistryProxy& self, const std::string& name, bool optional){
+        return srf::modules::ModuleRegistry::unregister_module(name, "default", optional);
+    }
+
+    static bool is_version_compatible(ModuleRegistryProxy& self, py::list release_version_l){
+        auto release_version = cast_from_pyobject(release_version_l);
         return srf::modules::ModuleRegistry::is_version_compatible(release_version);
     }
 
@@ -65,7 +76,7 @@ class ModuleRegistryProxy
                                                         const std::string& registry_namespace,
                                                         const std::string& module_name,
                                                         py::dict module_config){
-    auto json_config           = cast_from_pyobject(module_config);
+    auto json_config            = cast_from_pyobject(module_config);
     auto fn_module_constructor = srf::modules::ModuleRegistry::find_module(name, registry_namespace);
     auto module                = std::move(fn_module_constructor(std::move(module_name), std::move(json_config)));
     return std::move(module);

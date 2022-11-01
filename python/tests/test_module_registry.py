@@ -23,5 +23,6 @@ def test_module_registry_contains():
 
     print(f"Module registry contains 'xyz': {registry.contains_namespace('xyz')}")
 
+
 if (__name__ in ("__main__", )):
     test_module_registry_contains()

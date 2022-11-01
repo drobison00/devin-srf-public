@@ -16,9 +16,14 @@
  */
 
 #pragma once
+
+#include "pysrf/utils.hpp"
+#include <pybind11/cast.h>
 #include "srf/experimental/modules/module_registry.hpp"
 
 namespace srf::pysrf {
+
+namespace py = pybind11;
 
 // Export everything in the srf::pysrf namespace by default since we compile with -fvisibility=hidden
 #pragma GCC visibility push(default)
@@ -54,23 +59,20 @@ class ModuleRegistryProxy
         return srf::modules::ModuleRegistry::is_version_compatible(release_version);
     }
 
-    std::shared_ptr<srf::modules::SegmentModule> ModuleRegistry::find_module(
+    static std::shared_ptr<srf::modules::SegmentModule> find_module(
                                                         ModuleRegistryProxy& self,
-                                                        const std::string& module_id,
+                                                        const std::string& name,
                                                         const std::string& registry_namespace,
-                                                        std::string module_name,
-                                                        py::dict config)
-    {
-    auto json_config = cast_from_pyobject(config);
-    auto fn_module_constructor = srf::modules::ModuleRegistry::find_module(module_id, registry_namespace);
-    auto module                = std::move(fn_module_constructor(std::move(module_name), std::move(config)));
-
+                                                        const std::string& module_name,
+                                                        py::dict module_config){
+    auto json_config           = cast_from_pyobject(module_config);
+    auto fn_module_constructor = srf::modules::ModuleRegistry::find_module(name, registry_namespace);
+    auto module                = std::move(fn_module_constructor(std::move(module_name), std::move(json_config)));
     return std::move(module);
     }
+
     // TODO(devin)
     // register_module
-
-    // TODO(bhargav)
 };
 #pragma GCC visibility pop
 } // namespace srf::pysrf

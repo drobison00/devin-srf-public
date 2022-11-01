@@ -102,11 +102,6 @@ PYBIND11_MODULE(segment, m)
         py::class_<srf::modules::SegmentModule, std::shared_ptr<srf::modules::SegmentModule>>(m, "SegmentModule");
     auto SegmentModuleRegistry = py::class_<ModuleRegistryProxy>(m, "ModuleRegistry");
 
-    /**
-     * TODO(bhargav)
-     * srf.segment.ModuleRegistry <--- class
-     */
-
     /** Builder Interface Declarations **/
     /*
      * @brief Make a source node that generates py::object values
@@ -174,7 +169,7 @@ PYBIND11_MODULE(segment, m)
                 py::arg("module_config"),
                 py::return_value_policy::reference_internal);
 
-    //Builder.def("init_module", &BuilderProxy::init_module, py::object());
+    Builder.def("init_module", &BuilderProxy::init_module, py::arg("module"));
 
     Builder.def("make_node_full", &BuilderProxy::make_node_full, py::return_value_policy::reference_internal);
 
@@ -198,7 +193,6 @@ PYBIND11_MODULE(segment, m)
         "TemplateModuleString", "srf_unittest", PybindSegmentModuleVersion);
 
     /** Segment Module Interface Declarations **/
-    // TODO(bhargav): SegmentModule constructor binding
 
     SegmentModule.def("config", &SegmentModuleProxy::config);
 
@@ -255,9 +249,6 @@ PYBIND11_MODULE(segment, m)
                               py::arg("name"));
 
     SegmentModuleRegistry.def("registered_modules", &ModuleRegistryProxy::registered_modules);
-
-
-    // TODO(bhargav)
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

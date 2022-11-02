@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-#pragma once
-
 #include "pysrf/module_registry.hpp"
 
 #include "pysrf/py_segment_module.hpp"
@@ -31,7 +29,6 @@
 #include <memory>
 
 namespace srf::pysrf {
-
 namespace py = pybind11;
 
 bool ModuleRegistryProxy::contains_namespace(ModuleRegistryProxy& self, const std::string& registry_namespace)
@@ -77,11 +74,11 @@ void ModuleRegistryProxy::register_module(ModuleRegistryProxy& self,
     register_module(self, name, "default", release_version, fn_py_initializer);
 }
 
-void ModuleRegistryProxy::register_module(ModuleRegistryProxy& self,
+void ModuleRegistryProxy::register_module(srf::pysrf::ModuleRegistryProxy& self,
                                           std::string name,
                                           std::string registry_namespace,
                                           const std::vector<unsigned int>& release_version,
-                                          PythonSegmentModule::py_initializer_t fn_py_initializer)
+                                          std::function<void(srf::segment::Builder&)> fn_py_initializer)
 {
     VLOG(2) << "Registering python module: " << registry_namespace << "::" << name;
     auto fn_constructor = [fn_py_initializer](std::string name, nlohmann::json config) {
@@ -91,7 +88,7 @@ void ModuleRegistryProxy::register_module(ModuleRegistryProxy& self,
         return module;
     };
 
-    modules::ModuleRegistry::register_module(name, registry_namespace, release_version, fn_constructor);
+    srf::modules::ModuleRegistry::register_module(name, registry_namespace, release_version, fn_constructor);
 
     register_module_cleanup_fn(name, registry_namespace);
 }

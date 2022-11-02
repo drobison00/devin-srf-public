@@ -22,6 +22,7 @@
 
 #include "srf/experimental/modules/segment_modules.hpp"
 #include "srf/segment/builder.hpp"
+#include "srf/version.hpp"
 
 #include <pybind11/pybind11.h>
 
@@ -37,9 +38,9 @@ namespace srf::pysrf {
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(segment_modules, m)
+PYBIND11_MODULE(segment_modules, module)
 {
-    m.doc() = R"pbdoc(
+    module.doc() = R"pbdoc(
        Python bindings for SRF Segment Modules
        -------------------------------
        .. currentmodule:: Segment Modules
@@ -47,12 +48,12 @@ PYBIND11_MODULE(segment_modules, m)
           :toctree: _generate
    )pbdoc";
 
-    pysrf::import(m, "srf.core.common");
-    pysrf::import_module_object(m, "srf.core.segment", "Builder");
+    pysrf::import(module, "srf.core.common");
+    pysrf::import_module_object(module, "srf.core.segment", "Builder");
 
     auto SegmentModule =
-        py::class_<srf::modules::SegmentModule, std::shared_ptr<srf::modules::SegmentModule>>(m, "SegmentModule");
-    auto SegmentModuleRegistry = py::class_<ModuleRegistryProxy>(m, "ModuleRegistry");
+        py::class_<srf::modules::SegmentModule, std::shared_ptr<srf::modules::SegmentModule>>(module, "SegmentModule");
+    auto SegmentModuleRegistry = py::class_<ModuleRegistryProxy>(module, "ModuleRegistry");
 
     /** Segment Module Interface Declarations **/
     // TODO(bhargav): SegmentModule constructor binding
@@ -85,6 +86,9 @@ PYBIND11_MODULE(segment_modules, m)
 
     /** Module Register Interface Declarations **/
     SegmentModuleRegistry.def(py::init());
+
+    SegmentModuleRegistry.def(
+        "contains", &ModuleRegistryProxy::contains, py::arg("name"), py::arg("registry_namespace"));
 
     SegmentModuleRegistry.def(
         "contains_namespace", &ModuleRegistryProxy::contains_namespace, py::arg("registry_namespace"));
@@ -133,10 +137,9 @@ PYBIND11_MODULE(segment_modules, m)
                               py::arg("registry_namespace"),
                               py::arg("optional") = true);
 
-#ifdef VERSION_INFO
-    plugins_module.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
+    std::stringstream sstream;
+    sstream << srf_VERSION_MAJOR << "." << srf_VERSION_MINOR << "." << srf_VERSION_PATCH;
+
+    module.attr("__version__") = sstream.str();
 }
 }  // namespace srf::pysrf

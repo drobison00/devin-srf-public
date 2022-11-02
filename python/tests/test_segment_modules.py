@@ -19,7 +19,7 @@ import pytest
 
 import srf
 # Required to register sample modules with the ModuleRegistry
-import srf.core.unittest_exports
+import srf.tests.sample_modules
 
 packets_1 = 0
 packets_2 = 0

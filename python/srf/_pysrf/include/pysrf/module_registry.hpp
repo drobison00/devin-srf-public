@@ -28,6 +28,10 @@
 
 #include <memory>
 
+namespace srf::segment {
+class Builder;
+}
+
 namespace srf::pysrf {
 
 namespace py = pybind11;
@@ -59,13 +63,13 @@ class ModuleRegistryProxy
     static void register_module(ModuleRegistryProxy& self,
                                 std::string name,
                                 const std::vector<unsigned int>& release_version,
-                                PythonSegmentModule::py_initializer_t fn_py_initializer);
+                                std::function<void(srf::segment::Builder&)> fn_py_initializer);
 
     static void register_module(ModuleRegistryProxy&,
                                 std::string name,
                                 std::string registry_namespace,
                                 const std::vector<unsigned int>& release_version,
-                                PythonSegmentModule::py_initializer_t fn_py_initializer);
+                                std::function<void(srf::segment::Builder&)> fn_py_initializer);
 
     static void unregister_module(ModuleRegistryProxy& self,
                                   const std::string& name,

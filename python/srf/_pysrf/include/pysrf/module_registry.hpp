@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include "pysrf/py_segment_module.hpp"
-#include "pysrf/utils.hpp"
-
-#include "srf/experimental/modules/module_registry.hpp"
-
-#include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 
@@ -30,6 +24,10 @@
 
 namespace srf::segment {
 class Builder;
+}
+
+namespace srf::modules {
+class SegmentModule;
 }
 
 namespace srf::pysrf {
@@ -44,13 +42,9 @@ class ModuleRegistryProxy
   public:
     ModuleRegistryProxy() = default;
 
-    static bool contains_namespace(ModuleRegistryProxy& self, const std::string& registry_namespace);
-
     static bool contains(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace);
 
-    static bool contains_in_default(ModuleRegistryProxy& self, const std::string& name);
-
-    static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self);
+    static bool contains_namespace(ModuleRegistryProxy& self, const std::string& registry_namespace);
 
     static bool is_version_compatible(ModuleRegistryProxy& self, const std::vector<unsigned int>& release_version);
 
@@ -70,6 +64,8 @@ class ModuleRegistryProxy
                                 std::string registry_namespace,
                                 const std::vector<unsigned int>& release_version,
                                 std::function<void(srf::segment::Builder&)> fn_py_initializer);
+
+    static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self);
 
     static void unregister_module(ModuleRegistryProxy& self,
                                   const std::string& name,

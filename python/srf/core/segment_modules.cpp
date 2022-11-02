@@ -94,11 +94,6 @@ PYBIND11_MODULE(segment_modules, module)
     SegmentModuleRegistry.def(
         "contains_namespace", &ModuleRegistryProxy::contains_namespace, py::arg("registry_namespace"));
 
-    SegmentModuleRegistry.def(
-        "contains", &ModuleRegistryProxy::contains, py::arg("name"), py::arg("registry_namespace"));
-
-    SegmentModuleRegistry.def("contains", &ModuleRegistryProxy::contains_in_default, py::arg("name"));
-
     SegmentModuleRegistry.def("find_module",
                               &ModuleRegistryProxy::find_module,
                               py::arg("name"),
@@ -131,6 +126,8 @@ PYBIND11_MODULE(segment_modules, module)
         py::arg("registry_namespace"),
         py::arg("release_version"),
         py::arg("fn_constructor"));
+
+    SegmentModuleRegistry.def("registered_modules", &ModuleRegistryProxy::registered_modules);
 
     SegmentModuleRegistry.def("unregister_module",
                               &ModuleRegistryProxy::unregister_module,

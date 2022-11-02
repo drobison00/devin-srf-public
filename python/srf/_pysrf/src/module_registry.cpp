@@ -111,7 +111,7 @@ void ModuleRegistryProxy::unregister_module(ModuleRegistryProxy& self,
  * @param name Name of the module
  * @param registry_namespace Namespace of the module
  */
-static void register_module_cleanup_fn(const std::string& name, const std::string& registry_namespace)
+void ModuleRegistryProxy::register_module_cleanup_fn(const std::string& name, const std::string& registry_namespace)
 {
     auto at_exit = pybind11::module_::import("atexit");
     at_exit.attr("register")(pybind11::cpp_function([name, registry_namespace]() {

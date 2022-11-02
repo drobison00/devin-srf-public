@@ -61,7 +61,7 @@ class ModuleRegistryProxy
                                 const std::vector<unsigned int>& release_version,
                                 PythonSegmentModule::py_initializer_t fn_py_initializer);
 
-    static void register_module(ModuleRegistryProxy& self,
+    static void register_module(ModuleRegistryProxy&,
                                 std::string name,
                                 std::string registry_namespace,
                                 const std::vector<unsigned int>& release_version,

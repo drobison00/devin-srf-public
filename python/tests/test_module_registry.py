@@ -19,10 +19,9 @@ import pytest
 
 import srf
 
-
-def test_module_registry():
-    registry = srf.ModuleRegistry()
-    # registry.register_module(simple_mod_name, release_version, simple_mod_func);
+# def test_module_registry():
+#     registry = srf.ModuleRegistry()
+#     # registry.register_module(simple_mod_name, release_version, simple_mod_func);
 
 
 def test_contains_namespace():
@@ -89,8 +88,14 @@ def test_unregister_module():
     registry.unregister_module(simple_mod_name, registry_namespace, True)
 
 
-# def test_registered_modules():
-#     registry = srf.ModuleRegistry()
+def test_registered_modules():
+    registry = srf.ModuleRegistry()
+    registered_mod_dict = registry.registered_modules()
+
+    assert 'default' in registered_mod_dict
+    assert 'srf_unittest' in registered_mod_dict
+    assert len(registered_mod_dict) == 2
+
 
 if (__name__ in ("__main__", )):
     test_contains_namespace()
@@ -98,4 +103,4 @@ if (__name__ in ("__main__", )):
     test_find_module()
     test_is_version_compatible()
     test_unregister_module()
-    # test_registered_modules()
+    test_registered_modules()

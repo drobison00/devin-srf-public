@@ -106,7 +106,7 @@ TEST_F(SegmentTests, FindModuleTest)
     EXPECT_THROW(ModuleRegistry::find_module(module_name_3, registry_namespace), std::invalid_argument);
 }
 
-TEST_F(SegmentTests, UnRegistrerModuleTest)
+TEST_F(SegmentTests, UnRegisterModuleTest)
 {
     using namespace modules;
 
@@ -119,6 +119,17 @@ TEST_F(SegmentTests, UnRegistrerModuleTest)
 
     // Throws an exception when there is no registered module.
     EXPECT_THROW(ModuleRegistry::unregister_module(simple_mod_name, registry_namespace, false), std::invalid_argument);
+}
+
+TEST_F(SegmentTests, RegisteredModulesTest)
+{
+    using namespace modules;
+
+    auto rigestered_mods_map = ModuleRegistry::registered_modules();
+
+    EXPECT_EQ(rigestered_mods_map.size(), 2);
+    EXPECT_EQ(rigestered_mods_map.find("default") != rigestered_mods_map.end(), true);
+    EXPECT_EQ(rigestered_mods_map.find("module_registry_unittest") != rigestered_mods_map.end(), true);
 }
 
 TEST_F(SegmentTests, VersionCompatibleTest)

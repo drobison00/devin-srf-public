@@ -85,18 +85,13 @@ PYBIND11_MODULE(segment_modules, m)
     /** Module Register Interface Declarations **/
     SegmentModuleRegistry.def(py::init());
 
-    SegmentModuleRegistry.def("contains_namespace",
-                              &ModuleRegistryProxy::contains_namespace,
-                              py::arg("registry_namespace"));
+    SegmentModuleRegistry.def(
+        "contains_namespace", &ModuleRegistryProxy::contains_namespace, py::arg("registry_namespace"));
 
-    SegmentModuleRegistry.def("contains",
-                              &ModuleRegistryProxy::contains,
-                              py::arg("name"),
-                              py::arg("registry_namespace"));
+    SegmentModuleRegistry.def(
+        "contains", &ModuleRegistryProxy::contains, py::arg("name"), py::arg("registry_namespace"));
 
-    SegmentModuleRegistry.def("contains",
-                              &ModuleRegistryProxy::contains_in_default,
-                              py::arg("name"));
+    SegmentModuleRegistry.def("contains", &ModuleRegistryProxy::contains_in_default, py::arg("name"));
 
     SegmentModuleRegistry.def("find_module",
                               &ModuleRegistryProxy::find_module,
@@ -106,26 +101,36 @@ PYBIND11_MODULE(segment_modules, m)
                               py::arg("module_config"),
                               py::return_value_policy::reference_internal);
 
-    SegmentModuleRegistry.def("is_version_compatible",
-                              &ModuleRegistryProxy::is_version_compatible,
-                              py::arg("release_version"));
+    SegmentModuleRegistry.def(
+        "is_version_compatible", &ModuleRegistryProxy::is_version_compatible, py::arg("release_version"));
+
+    SegmentModuleRegistry.def(
+        "register_module",
+        static_cast<void (*)(ModuleRegistryProxy&,
+                             std::string,
+                             const std::vector<unsigned int>&,
+                             std::function<void(segment::Builder&)>)>(&ModuleRegistryProxy::register_module),
+        py::arg("name"),
+        py::arg("release_version"),
+        py::arg("fn_constructor"));
+
+    SegmentModuleRegistry.def(
+        "register_module",
+        static_cast<void (*)(ModuleRegistryProxy&,
+                             std::string,
+                             std::string,
+                             const std::vector<unsigned int>&,
+                             std::function<void(segment::Builder&)>)>(&ModuleRegistryProxy::register_module),
+        py::arg("name"),
+        py::arg("registry_namespace"),
+        py::arg("release_version"),
+        py::arg("fn_constructor"));
 
     SegmentModuleRegistry.def("unregister_module",
                               &ModuleRegistryProxy::unregister_module,
                               py::arg("name"),
                               py::arg("registry_namespace"),
-                              py::arg("optional"));
-
-    SegmentModuleRegistry.def("unregister_module",
-                              &ModuleRegistryProxy::unregister_module_in_default_ns,
-                              py::arg("name"));
-
-    SegmentModuleRegistry.def("unregister_module",
-                              &ModuleRegistryProxy::unregister_module_in_default_ns_2,
-                              py::arg("name"),
-                              py::arg("optional"));
-
-    SegmentModuleRegistry.def("registered_modules", &ModuleRegistryProxy::registered_modules);
+                              py::arg("optional") = true);
 
 #ifdef VERSION_INFO
     plugins_module.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

@@ -17,10 +17,16 @@
 
 #pragma once
 
+#include "pysrf/py_segment_module.hpp"
 #include "pysrf/utils.hpp"
-#include <pybind11/cast.h>
-#include <pybind11/pytypes.h>
+
 #include "srf/experimental/modules/module_registry.hpp"
+
+#include <pybind11/cast.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
+
+#include <memory>
 
 namespace srf::pysrf {
 
@@ -34,56 +40,49 @@ class ModuleRegistryProxy
   public:
     ModuleRegistryProxy() = default;
 
-    static bool contains_namespace(ModuleRegistryProxy& self, const std::string& registry_namespace)
-    {
-        return srf::modules::ModuleRegistry::contains_namespace(registry_namespace);
-    }
+    static bool contains_namespace(ModuleRegistryProxy& self, const std::string& registry_namespace);
 
-    static bool contains(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace)
-    {
-        return srf::modules::ModuleRegistry::contains(name, registry_namespace);
-    }
+    static bool contains(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace);
 
-    static bool contains_in_default(ModuleRegistryProxy& self, const std::string& name)
-    {
-        return srf::modules::ModuleRegistry::contains(name, "default");
-    }
+    static bool contains_in_default(ModuleRegistryProxy& self, const std::string& name);
 
-    static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self){
-        return srf::modules::ModuleRegistry::registered_modules();
-    }
+    static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self);
 
-    static void unregister_module(ModuleRegistryProxy& self, const std::string& name, const std::string& registry_namespace, bool optional){
-        return srf::modules::ModuleRegistry::unregister_module(name, registry_namespace, optional);
-    }
+    static bool is_version_compatible(ModuleRegistryProxy& self, py::list release_version_l);
 
-    static void unregister_module_in_default_ns(ModuleRegistryProxy& self, const std::string& name){
-        return srf::modules::ModuleRegistry::unregister_module(name, "default", true);
-    }
+    static std::shared_ptr<srf::modules::SegmentModule> find_module(ModuleRegistryProxy& self,
+                                                                    const std::string& name,
+                                                                    const std::string& registry_namespace,
+                                                                    const std::string& module_name,
+                                                                    py::dict module_config);
 
-    static void unregister_module_in_default_ns_2(ModuleRegistryProxy& self, const std::string& name, bool optional){
-        return srf::modules::ModuleRegistry::unregister_module(name, "default", optional);
-    }
+    static void register_module(ModuleRegistryProxy& self,
+                                std::string name,
+                                const std::vector<unsigned int>& release_version,
+                                PythonSegmentModule::py_initializer_t fn_py_initializer);
 
-    static bool is_version_compatible(ModuleRegistryProxy& self, py::list release_version_l){
-        auto release_version = cast_from_pyobject(release_version_l);
-        return srf::modules::ModuleRegistry::is_version_compatible(release_version);
-    }
+    static void register_module(ModuleRegistryProxy& self,
+                                std::string name,
+                                std::string registry_namespace,
+                                const std::vector<unsigned int>& release_version,
+                                PythonSegmentModule::py_initializer_t fn_py_initializer);
 
-    static std::shared_ptr<srf::modules::SegmentModule> find_module(
-                                                        ModuleRegistryProxy& self,
-                                                        const std::string& name,
-                                                        const std::string& registry_namespace,
-                                                        const std::string& module_name,
-                                                        py::dict module_config){
-    auto json_config            = cast_from_pyobject(module_config);
-    auto fn_module_constructor = srf::modules::ModuleRegistry::find_module(name, registry_namespace);
-    auto module                = std::move(fn_module_constructor(std::move(module_name), std::move(json_config)));
-    return std::move(module);
-    }
+    static void unregister_module(ModuleRegistryProxy& self,
+                                  const std::string& name,
+                                  const std::string& registry_namespace,
+                                  bool optional = true);
 
-    // TODO(devin)
-    // register_module
+  private:
+    /**
+     * When we register python modules, we have to capture a python-land initializer function, which is in turn
+     * stored in the ModuleRegistry -- a global static struct. If the registered modules that capture a python
+     * function are not unregistered when the python interpreter exits, it will hang, waiting on their ref counts
+     * to drop to zero. To ensure this doesn't happen, we register an atexit callback here that forces all python
+     * modules to be unregistered when the interpreter is shut down.
+     * @param name Name of the module
+     * @param registry_namespace Namespace of the module
+     */
+    static void register_module_cleanup_fn(const std::string& name, const std::string& registry_namespace);
 };
 #pragma GCC visibility pop
-} // namespace srf::pysrf
+}  // namespace srf::pysrf

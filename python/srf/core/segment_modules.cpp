@@ -57,6 +57,7 @@ PYBIND11_MODULE(segment_modules, module)
 
     /** Segment Module Interface Declarations **/
     // TODO(bhargav): SegmentModule constructor binding
+    SegmentModuleRegistry.def(py::init());
 
     SegmentModule.def("config", &SegmentModuleProxy::config);
 

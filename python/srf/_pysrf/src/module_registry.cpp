@@ -25,6 +25,7 @@
 #include <pybind11/cast.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
+#include <pybind11/stl.h>
 
 #include <memory>
 
@@ -48,9 +49,9 @@ std::map<std::string, std::vector<std::string>> ModuleRegistryProxy::registered_
     return modules::ModuleRegistry::registered_modules();
 }
 
-bool ModuleRegistryProxy::is_version_compatible(ModuleRegistryProxy& self, py::list release_version_l)
+bool ModuleRegistryProxy::is_version_compatible(ModuleRegistryProxy& self,
+                                                const std::vector<unsigned int>& release_version)
 {
-    auto release_version = cast_from_pyobject(release_version_l);
     return modules::ModuleRegistry::is_version_compatible(release_version);
 }
 

@@ -52,7 +52,7 @@ class ModuleRegistryProxy
 
     static std::map<std::string, std::vector<std::string>> registered_modules(ModuleRegistryProxy& self);
 
-    static bool is_version_compatible(ModuleRegistryProxy& self, py::list release_version_l);
+    static bool is_version_compatible(ModuleRegistryProxy& self, const std::vector<unsigned int>& release_version);
 
     static std::shared_ptr<srf::modules::SegmentModule> find_module(ModuleRegistryProxy& self,
                                                                     const std::string& name,

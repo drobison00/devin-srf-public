@@ -85,7 +85,7 @@ cd $MRC_ROOT
 #### Create MRC Conda environment
 ```bash
 # note: `mamba` may be used in place of `conda` for better performance.
-conda env create -n mrc --file $MRC_ROOT/ci/conda/environments/dev_env.yml
+conda env create -n mrc --file $MRC_ROOT/docker/conda/environments/cuda[CUDA_VERSION]_dev.yml
 conda activate mrc
 ```
 #### Build MRC
